@@ -1,14 +1,28 @@
 # Behavioral-and-Cognitive-Robotics
 
-All the tasks you can find in the branches. 
+All the tasks you can find in the folders.
 
+# Clone the repository
 
 ```bash
 git clone https://github.com/Terminateit/Behavioral-and-Cognitive-Robotics.git
 ```
 
-## See the branches in order to switch between them:
+# Download the container
 
 ```bash
-git branch --all 
+docker pull vkurenkov/cognitive-robotics
 ```
+
+# Run container
+
+```bash
+docker run -it \
+  -p 6080:6080 \
+  -p 8888:8888 \
+  --mount source=cognitive-robotics-opt-volume,target=/opt \
+  vkurenkov/cognitive-robotics
+  
+```
+
+# Play!
