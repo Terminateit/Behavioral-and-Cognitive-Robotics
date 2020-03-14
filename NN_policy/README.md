@@ -19,7 +19,7 @@ python3 ../bin/es.py -f acrobot.ini -t bestgS<seed>.npy
 ```
 The example of result you can see here:
 
-![The behavior](https://raw.githubusercontent.com/Terminateit/Behavioral-and-Cognitive-Robotics/NN_policy/Files/BestS15.png)
+![The behavior](https://raw.githubusercontent.com/Terminateit/Behavioral-and-Cognitive-Robotics/master/NN_policy/Files/BestS15.png)
 
 After that, I  displayed the variation of performance across generations and the average and standard deviation of
 performance among multiple runs, using the following command, respectively:
@@ -30,7 +30,7 @@ python3 ../bin/plotave.py
 ```
 The example of result you can see here:
 
-![Plot of performance](https://raw.githubusercontent.com/Terminateit/Behavioral-and-Cognitive-Robotics/NN_policy/Files/statS.png)
+![Plot of performance](https://raw.githubusercontent.com/Terminateit/Behavioral-and-Cognitive-Robotics/master/NN_policy/Files/statS.png)
 
 Average Generalization: -66.56 +-1.13 (3 S*.fit files)
 
