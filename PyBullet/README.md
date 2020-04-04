@@ -30,9 +30,3 @@ The idea of evolutionary algorithm is that there're crowd of agents are being le
 
 As to reward functions, I saw that the modified one has more adequate and suitable sum of rewards. There is implemented some conditions of touching the ground by feet and number of steps toward the target. Also, there is introduced angle offset between target and robot. Additionally, if I am correct, on the original one there is alive parametes in reward function that may constraint the robot moves (it makes him moving only with pitch angle rotating)
 
-# Task 5: 
-## Implementing a new Gym/Bullet environment
-
-### This section includes a guideline for creating and using a new Gym environment from scratch. It is an adapted version of a tutorial https://backyardrobotics.eu/2017/11/27/build-a-balancing-bot-with-openai-gym-pt-i-setting-up/. The problem concerns a simple wheeled robot that can be trained for the ability to balance. thus name the environment BalancebotBulletEnv-v0 and the folder containing the implement
-
-
