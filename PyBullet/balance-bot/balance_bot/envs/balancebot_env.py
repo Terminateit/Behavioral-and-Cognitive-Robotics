@@ -30,105 +30,89 @@ class BalancebotEnv(gym.Env):
 
 
     def __init__(self, render=False):
-        # action encodes the torque applied by the motor of the wheels
-        self.action_space = spaces.Box(-1., 1., shape=(1,), dtype='float32')
-        # observation encodes pitch, gyro, com.sp.
-        self.observation = []
-        self.observation_space = spaces.Box(np.array([-math.pi, -math.pi, -5]),
-        np.array([math.pi, math.pi, 5]), dtype='float32')
-        self.connectmode = 0
-        # starts without graphic by default
-        self.physicsClient = p.connect(p.DIRECT)
-        # used by loadURDF
-        p.setAdditionalSearchPath(pybullet_data.getDataPath())
-        self.seed()
+        self._observation = []
+        self.action_space = spaces.Discrete(9)
+        self.observation_space = spaces.Box(np.array([-math.pi, -math.pi, -5]), 
+                                            np.array([math.pi, math.pi, 5])) # pitch, gyro, com.sp.
 
-    # The seed() method sets the seed of the random number generator that, in turn, influence the initial
-        # conditions experienced during evaluation episodes.
-    def seed(self, seed=None):
+
+        self.physicsClient = p.connect(p.GUI)  # Graphical version
+        # self.physicsClient = p.connect(p.DIRECT)  # Non-Graphical version (for evolving)
+
+        p.setAdditionalSearchPath(pybullet_data.getDataPath())  # used by loadURDF
+
+        self._seed()
+        
+        # paramId = p.addUserDebugParameter("My Param", 0, 100, 50)
+
+    def _seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
         return [seed]
 
-    # The reset() method initializes the position, velocity, and orientation of the robot, load the files
-    # containing the description of the plane and of the robot, and compute and return the observation. The
-    # orientation of the robot is varied randomly within a given range.
-    def reset(self):
+    def _step(self, action):
+        self._assign_throttle(action)
+        p.stepSimulation()
+        self._observation = self._compute_observation()
+        reward = self._compute_reward()
+        done = self._compute_done()
+
+        self._envStepCounter += 1
+
+        return np.array(self._observation), reward, done, {}
+
+    def _reset(self):
+        # reset is called once at initialization of simulation
         self.vt = 0
-        # current velocity pf the wheels
-        self.maxV = 24.6 # max lelocity, 235RPM = 24,609142453 rad/sec
-        self.envStepCounter = 0
+        self.vd = 0
+        self.maxV = 24.6 # 235RPM = 24,609142453 rad/sec
+        self._envStepCounter = 0
+
         p.resetSimulation()
-        p.setGravity(0, 0,-10) # m/s^2
-        p.setTimeStep(0.01)
-        # the duration of a step in sec
+        p.setGravity(0,0,-10) # m/s^2
+        p.setTimeStep(0.01) # sec
         planeId = p.loadURDF("plane.urdf")
-        robotStartPos = [0,0,0.001]
-        robotStartOrientation = p.getQuaternionFromEuler([self.np_random.uniform(low=-
-        0.3, high=0.3),0,0])
+        cubeStartPos = [0,0,0.001]
+        cubeStartOrientation = p.getQuaternionFromEuler([0,0,0])
+
         path = os.path.abspath(os.path.dirname(__file__))
         self.botId = p.loadURDF(os.path.join(path, "balancebot_simple.xml"),
-        robotStartPos,
-        robotStartOrientation)
-        self.observation = self.compute_observation()
-        return np.array(self.observation)
-        
-    #     The step() method sets the state of the actuators, advances the simulation for a step, computes the
-    # new observation, computes the reward, checks whether the condition for terminating the evaluation
-    # episode are satisfied or not, and increases the step counter. The method receives as input the action
-    # to perform and returns the observation, the reward, a Boolean value that indicates whether the episode
-    # should terminate, and an empty dictionary.
-    def step(self, action):
-        self.set_actuator(action)
-        p.stepSimulation()
-        self.observation = self.compute_observation()
-        reward = self.compute_reward()
-        done = self.compute_done()
-        self.envStepCounter += 1
-        status = "Step " + str(self.envStepCounter) + " Reward " + '{0:.2f}'.format(reward)
-        p.addUserDebugText(status, [0,-1,3], replaceItemUniqueId=1)
-        return np.array(self.observation), reward, done, {}
+                           cubeStartPos,
+                           cubeStartOrientation)
 
-    # The render() method connects the graphic display for the visualization of the robot and of the
-    # environment
+        # you *have* to compute and return the observation from reset()
+        self._observation = self._compute_observation()
+        return np.array(self._observation)
 
-    def render(self, mode='human', close=False):
-        if (self.connectmode == 0):
-            p.disconnect(self.physicsClient)
-        # connect the graphic renderer
-            self.physicsClient = p.connect(p.GUI)
-            self.connectmode = 1
-        pass
-        
-    # Finally, the following four methods: update the desired velocity of the actuators; compute the
-    # observation on the basis of the current position, orientation and velocity of the robot; compute the
-    # reward; check whether the episode should terminate.
-
-    def set_actuator(self, action):
-        deltav = action[0]
-        vt = np.clip(self.vt + deltav, -self.maxV, self.maxV)
+    def _assign_throttle(self, action):
+        dv = 0.1
+        deltav = [-10.*dv,-5.*dv, -2.*dv, -0.1*dv, 0, 0.1*dv, 2.*dv,5.*dv, 10.*dv][action]
+        vt = clamp(self.vt + deltav, -self.maxV, self.maxV)
         self.vt = vt
-        p.setJointMotorControl2(bodyUniqueId=self.botId,
-        jointIndex=0,
-        controlMode=p.VELOCITY_CONTROL,
-        targetVelocity=vt)
-        p.setJointMotorControl2(bodyUniqueId=self.botId,
-        jointIndex=1,
-        controlMode=p.VELOCITY_CONTROL,
-        targetVelocity=-vt)
 
-    def compute_observation(self):
-        robotPos, robotOrn = p.getBasePositionAndOrientation(self.botId)
-        robotEuler = p.getEulerFromQuaternion(robotOrn)
+        p.setJointMotorControl2(bodyUniqueId=self.botId, 
+                                jointIndex=0, 
+                                controlMode=p.VELOCITY_CONTROL, 
+                                targetVelocity=vt)
+        p.setJointMotorControl2(bodyUniqueId=self.botId, 
+                                jointIndex=1, 
+                                controlMode=p.VELOCITY_CONTROL, 
+                                targetVelocity=-vt)
+
+    def _compute_observation(self):
+        cubePos, cubeOrn = p.getBasePositionAndOrientation(self.botId)
+        cubeEuler = p.getEulerFromQuaternion(cubeOrn)
         linear, angular = p.getBaseVelocity(self.botId)
-        return (np.array([robotEuler[0],angular[0],self.vt], dtype='float32'))
+        return [cubeEuler[0],angular[0],self.vt]
 
-    def compute_reward(self):
-        # receive a bonus of 1 for balancing and pay a small cost proportional to speed
-        return 1.0 - abs(self.vt) * 0.05
+    def _compute_reward(self):
+        return 0.1 - abs(self.vt - self.vd) * 0.005
 
-    def compute_done(self):
-        # episode ends when the barycentre of the robot is too low or after 500 steps
+    def _compute_done(self):
         cubePos, _ = p.getBasePositionAndOrientation(self.botId)
-        return cubePos[2] < 0.15 or self.envStepCounter >= 500
+        return cubePos[2] < 0.15 or self._envStepCounter >= 1500
 
+    def _render(self, mode='human', close=False):
+        pass
 
+def clamp(n, minn, maxn):
+    return max(min(maxn, n), minn)
