@@ -33,6 +33,6 @@ As to reward functions, I saw that the modified one has more adequate and suitab
 # Task 5: 
 ## Implementing a new Gym/Bullet environment
 
-### This section includes a guideline for creating and using a new Gym environment from scratch. It is an adapted version of a tutorial developed by Backyard Robotics available from https://backyardrobotics.eu/2017/11/27/build-a-balancing-bot-with-openai-gym-pt-i-setting-up/. This will constitute the Exercise 5. The problem concerns a simple wheeled robot that can be trained for the ability to balance. We can thus name the environment BalancebotBulletEnv-v0 and the folder containing the implementation of the environment balance-bot. The robot will be simulated by using the PyBullet dynamic simulator.
+This section includes a guideline for creating and using a new Gym environment from scratch. It is an adapted version of a tutorial developed by Backyard Robotics available from https://backyardrobotics.eu/2017/11/27/build-a-balancing-bot-with-openai-gym-pt-i-setting-up/. This will constitute the Exercise 5. The problem concerns a simple wheeled robot that can be trained for the ability to balance. We can thus name the environment BalancebotBulletEnv-v0 and the folder containing the implementation of the environment balance-bot. The robot will be simulated by using the PyBullet dynamic simulator.
 
-### All the files you can find in folders.
+#### All the files you can find in folders.
