@@ -84,8 +84,7 @@ class BalancebotEnv(gym.Env):
         reward = self.compute_reward()
         done = self.compute_done()
         self.envStepCounter += 1
-        status = "Step " + str(self.envStepCounter) + " Reward " +
-        '{0:.2f}'.format(reward)
+        status = "Step " + str(self.envStepCounter) + " Reward " + '{0:.2f}'.format(reward)
         p.addUserDebugText(status, [0,-1,3], replaceItemUniqueId=1)
         return np.array(self.observation), reward, done, {}
 
