@@ -47,3 +47,26 @@ I went through all the instructions in the guide and on the site given below. An
 ## Kinematic Simulations
 
 In this section I familiarized with kinematic simulations of robots.
+
+>Dynamical simulator, like bullet, are necessary for simulating accurately the dynamics of articulated robots and for simulating the effect of collisions. In the case of wheeled robots moving on a flat surface, however, kinematic simulations can suffice. Kinematic simulations permit to reduce the simulation cost significantly with respect to dynamical simulations. For this reason, evorobotpy includes a set of environments involving wheeled robots that rely on a kinematic simulations implemented in C++.
+One of these environments is ErDiscrim that involves a Khepera robot, i.e. a small wheeled robot
+provided with infrared sensors (Mondada, Franzi & Ienne, 1993). The robot is situated on a flat arena surrounded by walls and including a cylindrical object. The task to be solved consists in finding and remaining near the cylinder. 
+
+>The source code (discrim.cpp, discrim.h, utilities.cpp, utilities.h, robot-env.cpp, robot-env.h, ErDiscrim.pxd, ErDiscrim.pyx, and setupErDiscrim.py) can be compiled from the ./lib folder with the following instructions:
+
+```bash
+python3 setupErDiscrim.py build_ext --inplace
+cp ErDiscrim*.so ../bin # or cp ErDiscrim*.dll ../bin
+``` 
+##### The discrim.cpp and discrim.h files include the definition of the gym functions (i.e. env-reset(), env.step(), env.render() ext.) and the calculation of the reward. The robot-env.cpp and robot-env.h files include a series of methods that permit to simulate the translation and rotation movement of the robot in 2D, the activation of the infrared sensors, and the occurrence of collision. The program terminates the evaluation episode when a collision occurs. Consequently, there is no need to model the effect of collisions in detail. The robot-env.cpp and robot-env.h files permit to simulate also two other type of wheeled robots: the ePuck (Mondada et al., 2009) and the MarXbot (Bonani et al., 2010). These robots are used in other environments.
+
+### Task: 
+> Run 10 replications of the experiment from the evorobotpy/xdiscrim folder by using different seeds. 
+
+> Test and analyze the strategy displayed by best robot of each replication. 
+
+> Describe the strategies of the robots by grouping them in families. Try to explain why the robot of each family behave in that manner. 
+
+> Run other experiments by using a feed-forward neural architecture (without memory). 
+
+> Explain how the behavior of evolved robots differ from those evolved with the LSTM architecture (i.e. the Long Short Term Memory architecture).
