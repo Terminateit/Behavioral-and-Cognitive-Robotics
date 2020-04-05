@@ -63,10 +63,21 @@ cp ErDiscrim*.so ../bin # or cp ErDiscrim*.dll ../bin
 ### Task: 
 > Run 10 replications of the experiment from the evorobotpy/xdiscrim folder by using different seeds. 
 
-> Test and analyze the strategy displayed by best robot of each replication. 
+Done. All the corresponding files you can find in the folder xdiscrim_sim
 
-> Describe the strategies of the robots by grouping them in families. Try to explain why the robot of each family behave in that manner. 
+> Test and analyze the strategy displayed by best robot of each replication. Describe the strategies of the robots by grouping them in families. Try to explain why the robot of each family behave in that manner.  
+
+Actualy, there are two families of robots (which behavior of achieving the target differs):
+
+* 1st one: achieves the target through, like, obstacles avoiding and staying about the target. The angle of robot targets to the desired point.
+* 2nd one: it's like jumping on the obstacles until it finds the target, after that it starts rotating around the target point. Also, it could even go backward due to having lots of sensors.
+
+I think that such behaviour happens due to the presence of 8 infrared sensors, by which robot know where is the target and so on. The help him to avoid obstacles and to see black desired point on the ground. But sometimes it doesn't go to the cylinder and stay nearby it. I think, it's because of switching behaviour of infrared sensor.
 
 > Run other experiments by using a feed-forward neural architecture (without memory). 
 
+Done.
+
 > Explain how the behavior of evolved robots differ from those evolved with the LSTM architecture (i.e. the Long Short Term Memory architecture).
+
+It differs: the robots with FF NN architecture sometimes go to the target but doesn't stop nearby it because of not having back-forward loop. Also, FF can increase the error, causing the robot to avoid the desired point and going through it.
